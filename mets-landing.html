@@ -1,1127 +1,1825 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>METS — Insumos Vitivinícolas</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
-  <style>
-    /* ============================================================
-       VARIABLES — paleta chardonnay/crema, negro solo como acento
-    ============================================================ */
-    :root {
-      --gold:         #d4a843;
-      --gold-light:   #f0dfa0;
-      --gold-pale:    #faf6e8;    /* fondo general — casi blanco cálido */
-      --gold-wash:    #f4edcc;    /* secciones alternas */
-      --gold-border:  #e0cc88;    /* bordes */
-
-      --warm-dark:    #2c2416;    /* casi negro cálido — titulares */
-      --warm-mid:     #5c4e32;    /* texto secundario */
-      --warm-light:   #9e8756;    /* eyebrows / texto terciario */
-      --warm-surface: #efe9d4;    /* tarjetas */
-
-      --olive:        #5a6e3a;
-
-      --white:        #ffffff;
-
-      --font-display: 'Playfair Display', Georgia, serif;
-      --font-body:    'DM Sans', sans-serif;
-
-      --max:     1160px;
-      --pad:     100px 28px;
-      --r-sm:    6px;
-      --r-md:    14px;
-      --r-lg:    24px;
-      --ease:    0.3s ease;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: var(--font-body);
-      font-size: 16px;
-      line-height: 1.7;
-      color: var(--warm-dark);
-      background: var(--gold-pale);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    img { display: block; max-width: 100%; }
-    a { color: inherit; text-decoration: none; }
-
-    .eyebrow {
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--warm-light);
-    }
-
-    h1, h2, h3 { font-family: var(--font-display); line-height: 1.18; color: var(--warm-dark); }
-    h1 { font-size: clamp(2.3rem, 5vw, 3.8rem); font-weight: 700; }
-    h2 { font-size: clamp(1.7rem, 3vw, 2.5rem); font-weight: 600; }
-    h3 { font-size: 1.1rem; font-weight: 600; }
-    p  { color: var(--warm-mid); line-height: 1.75; }
-
-    /* ============================================================
-       BOTONES
-    ============================================================ */
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 13px 26px;
-      font-family: var(--font-body); font-size: 13.5px; font-weight: 600;
-      border-radius: var(--r-sm); cursor: pointer; border: none;
-      transition: var(--ease); letter-spacing: 0.02em;
-    }
-    .btn-dark  { background: var(--warm-dark); color: var(--gold-light); }
-    .btn-dark:hover { background: var(--warm-mid); transform: translateY(-1px); }
-    .btn-outline { background: transparent; color: var(--warm-dark); border: 1.5px solid var(--warm-dark); }
-    .btn-outline:hover { background: var(--warm-dark); color: var(--gold-light); }
-
-    /* ============================================================
-       NAVBAR
-    ============================================================ */
-    .navbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: var(--gold-pale);
-      border-bottom: 1px solid var(--gold-border);
-    }
-    .nav-inner {
-      max-width: var(--max); margin: 0 auto; padding: 0 28px;
-      height: 70px; display: flex; align-items: center; justify-content: space-between;
-    }
-
-    /* Logo navbar — SVG fiel al original, fondo #e7de99, montaña dorada, texto negro */
-    .nav-logo svg { height: 46px; width: auto; }
-
-    .nav-links { display: flex; align-items: center; gap: 36px; list-style: none; }
-    .nav-links a {
-      font-size: 13.5px; font-weight: 500; color: var(--warm-mid);
-      position: relative; transition: color var(--ease);
-    }
-    .nav-links a::after {
-      content: ''; position: absolute; bottom: -4px; left: 0;
-      width: 0; height: 1.5px; background: var(--gold); transition: width var(--ease);
-    }
-    .nav-links a:hover { color: var(--warm-dark); }
-    .nav-links a:hover::after { width: 100%; }
-
-    .hamburger {
-      display: none; flex-direction: column; gap: 5px;
-      background: none; border: none; cursor: pointer; padding: 4px;
-    }
-    .hamburger span { display: block; width: 24px; height: 2px; background: var(--warm-dark); border-radius: 2px; }
-
-    .mobile-nav {
-      display: none; background: var(--gold-wash);
-      padding: 20px 28px 28px; border-top: 1px solid var(--gold-border);
-    }
-    .mobile-nav.open { display: block; }
-    .mobile-nav ul { list-style: none; display: flex; flex-direction: column; gap: 18px; }
-    .mobile-nav a { font-size: 15px; font-weight: 500; color: var(--warm-dark); }
-
-    /* ============================================================
-       HERO
-    ============================================================ */
-    .hero {
-      padding-top: 70px; background: var(--gold-pale);
-      min-height: 100vh; display: flex; align-items: center;
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: ''; position: absolute; inset: 0;
-      background-image: repeating-linear-gradient(
-        -55deg, transparent, transparent 48px,
-        rgba(212,168,67,0.06) 48px, rgba(212,168,67,0.06) 49px
-      );
-      pointer-events: none;
-    }
-    .hero-inner {
-      max-width: var(--max); margin: 0 auto;
-      padding: 80px 28px 100px;
-      display: grid; grid-template-columns: 1.1fr 0.9fr;
-      gap: 72px; align-items: center; position: relative; z-index: 1;
-    }
-
-    /* Logo grande hero — fondo #e7de99, montaña BLANCA, texto negro */
-    .hero-logo { margin-bottom: 32px; }
-    .hero-logo svg { height: 108px; width: auto; }
-
-    .hero h1 { margin-bottom: 20px; }
-    .hero h1 em { font-style: italic; color: var(--gold); }
-    .hero-lead { font-size: 1.06rem; color: var(--warm-mid); margin-bottom: 38px; max-width: 490px; }
-    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
-
-    /* Panel derecho */
-    .hero-panel {
-      background: var(--white);
-      border-radius: var(--r-lg);
-      border: 1px solid var(--gold-border);
-      padding: 34px 30px;
-    }
-    .hero-panel-label {
-      font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
-      text-transform: uppercase; color: var(--warm-light);
-      margin-bottom: 18px; padding-bottom: 16px;
-      border-bottom: 1px solid var(--gold-border);
-    }
-    .panel-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-    .panel-item {
-      display: flex; align-items: center; gap: 14px;
-      padding: 14px 16px; background: var(--gold-pale);
-      border-radius: var(--r-sm); border: 1px solid var(--gold-border);
-    }
-    .panel-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
-    .panel-name { font-size: 14px; font-weight: 600; color: var(--warm-dark); }
-    .panel-sub  { font-size: 12px; color: var(--warm-light); }
-
-    /* ============================================================
-       MARQUEE
-    ============================================================ */
-    .strip { background: var(--warm-dark); padding: 14px 0; overflow: hidden; }
-    .strip-track {
-      display: flex; gap: 60px;
-      animation: marquee 26s linear infinite;
-      white-space: nowrap;
-    }
-    .strip-item {
-      display: inline-flex; align-items: center; gap: 14px;
-      font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--gold-light); flex-shrink: 0;
-    }
-    .strip-sep { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
-    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-    /* ============================================================
-       ABOUT
-    ============================================================ */
-    .about { padding: var(--pad); background: var(--white); }
-    .about-inner {
-      max-width: var(--max); margin: 0 auto; padding: 0 28px;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
-    }
-
-    .about-graphic {
-      width: 100%; aspect-ratio: 5/6; background: var(--gold-wash);
-      border-radius: var(--r-lg); border: 1px solid var(--gold-border);
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 22px; overflow: hidden; position: relative;
-    }
-    .about-graphic::before {
-      content: ''; position: absolute; top: -40px; right: -40px;
-      width: 200px; height: 200px; border-radius: 50%;
-      border: 40px solid rgba(212,168,67,0.12);
-    }
-    .about-graphic::after {
-      content: ''; position: absolute; bottom: -50px; left: -50px;
-      width: 240px; height: 240px; border-radius: 50%;
-      border: 50px solid rgba(212,168,67,0.08);
-    }
-    /* Logo mediano dentro del gráfico — fondo #e7de99, montaña blanca */
-    .about-graphic .about-logo svg { height: 80px; width: auto; position: relative; z-index: 1; }
-    .about-tagline {
-      font-family: var(--font-display); font-size: 1.1rem; font-weight: 600;
-      color: var(--warm-dark); text-align: center; padding: 0 32px;
-      position: relative; z-index: 1;
-    }
-    .about-chip {
-      position: absolute; bottom: 24px; right: 24px;
-      background: var(--warm-dark); border-radius: var(--r-md);
-      padding: 16px 20px; z-index: 2;
-    }
-    .about-chip-title { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--gold-light); margin-bottom: 2px; }
-    .about-chip-sub   { font-size: 11px; color: rgba(240,223,160,0.55); }
-
-    .about-content .eyebrow { margin-bottom: 14px; }
-    .about-content h2       { margin-bottom: 18px; }
-    .about-content > p      { margin-bottom: 18px; }
-
-    .pillars { margin-top: 30px; display: flex; flex-direction: column; gap: 14px; }
-    .pillar {
-      display: flex; align-items: flex-start; gap: 16px;
-      padding: 18px 20px; border: 1px solid var(--gold-border);
-      border-radius: var(--r-md); background: var(--gold-pale);
-      transition: border-color var(--ease), background var(--ease);
-    }
-    .pillar:hover { border-color: var(--gold); background: var(--gold-wash); }
-    .pillar-bar { width: 3px; height: 36px; border-radius: 3px; background: var(--gold); flex-shrink: 0; margin-top: 2px; }
-    .pillar-title { font-size: 13.5px; font-weight: 600; color: var(--warm-dark); margin-bottom: 3px; }
-    .pillar-text  { font-size: 13px; color: var(--warm-mid); line-height: 1.55; }
-
-    /* ============================================================
-       PRODUCTOS
-    ============================================================ */
-    .products { padding: var(--pad); background: var(--gold-pale); }
-    .prod-inner { max-width: var(--max); margin: 0 auto; padding: 0 28px; }
-
-    .prod-header {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
-      align-items: end; margin-bottom: 52px;
-    }
-    .prod-header .eyebrow { margin-bottom: 12px; }
-
-    .prod-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-
-    .pcard {
-      background: var(--white); border-radius: var(--r-lg);
-      border: 1px solid var(--gold-border);
-      display: flex; flex-direction: column; overflow: hidden;
-      transition: transform var(--ease), border-color var(--ease);
-    }
-    .pcard:hover { transform: translateY(-4px); border-color: var(--gold); }
-    .pcard.feat  { grid-column: span 2; flex-direction: row; }
-
-    .pcard-img {
-      display: flex; align-items: center; justify-content: center;
-      min-height: 180px; position: relative; flex-shrink: 0;
-    }
-    .pcard.feat .pcard-img { width: 40%; min-height: 280px; }
-
-    .pcard-icon { width: 60px; height: 60px; opacity: 0.5; }
-
-    .pcard-badge {
-      position: absolute; top: 14px; left: 14px;
-      background: var(--warm-dark); color: var(--gold-light);
-      font-size: 9.5px; font-weight: 700; letter-spacing: 0.12em;
-      text-transform: uppercase; padding: 4px 10px; border-radius: 4px;
-    }
-
-    .pcard-body { padding: 26px 28px; display: flex; flex-direction: column; flex: 1; }
-    .pcard-cat {
-      font-size: 10px; font-weight: 700; letter-spacing: 0.16em;
-      text-transform: uppercase; color: var(--olive); margin-bottom: 8px;
-    }
-    .pcard h3 { font-size: 1.1rem; margin-bottom: 10px; }
-    .pcard.feat h3 { font-size: 1.35rem; }
-    .pcard p  { font-size: 13.5px; line-height: 1.65; flex: 1; }
-
-    .card-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 18px; }
-    .ctag {
-      font-size: 11px; font-weight: 600; padding: 3px 11px;
-      background: var(--gold-wash); color: var(--warm-mid);
-      border: 1px solid var(--gold-border); border-radius: 50px;
-    }
-    .card-cta {
-      display: inline-flex; align-items: center; gap: 5px;
-      margin-top: 18px; font-size: 13px; font-weight: 600;
-      color: var(--warm-dark); transition: gap var(--ease);
-    }
-    .card-cta:hover { gap: 9px; }
-
-    /* ============================================================
-       PROCESO
-    ============================================================ */
-    .process { padding: var(--pad); background: var(--warm-dark); }
-    .proc-inner { max-width: var(--max); margin: 0 auto; padding: 0 28px; }
-    .proc-header {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 56px;
-      align-items: end; margin-bottom: 64px;
-    }
-    .proc-header .eyebrow { color: var(--gold-light); opacity: 0.65; }
-    .proc-header h2 { color: var(--gold-light); }
-    .proc-header p  { color: rgba(240,223,160,0.45); }
-
-    .steps { display: grid; grid-template-columns: repeat(4, 1fr); position: relative; }
-    .steps::before {
-      content: ''; position: absolute; top: 28px; left: 8%; right: 8%;
-      height: 1px; background: rgba(212,168,67,0.18);
-    }
-    .step { padding-right: 24px; position: relative; z-index: 1; }
-    .step-num {
-      width: 56px; height: 56px; border-radius: 50%;
-      border: 1.5px solid rgba(212,168,67,0.3);
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--font-display); font-size: 1rem; font-weight: 700;
-      color: var(--gold); background: var(--warm-dark); margin-bottom: 22px;
-    }
-    .step-title { font-family: var(--font-display); font-size: 1rem; font-weight: 600; color: var(--gold-light); margin-bottom: 10px; }
-    .step-text  { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.65; }
-
-    /* ============================================================
-       POR QUE
-    ============================================================ */
-    .why { padding: var(--pad); background: var(--gold-wash); }
-    .why-inner { max-width: var(--max); margin: 0 auto; padding: 0 28px; }
-    .why-header { text-align: center; max-width: 560px; margin: 0 auto 56px; }
-    .why-header .eyebrow { margin-bottom: 12px; }
-    .why-header h2 { margin-bottom: 14px; }
-
-    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-    .wcard {
-      background: var(--white); border-radius: var(--r-lg);
-      padding: 30px 26px; border: 1px solid var(--gold-border);
-      transition: transform var(--ease), border-color var(--ease);
-    }
-    .wcard:hover { transform: translateY(-3px); border-color: var(--gold); }
-    .wbar { width: 30px; height: 3px; background: var(--gold); border-radius: 3px; margin-bottom: 18px; }
-    .wcard h3 { font-size: 1rem; margin-bottom: 9px; }
-    .wcard p  { font-size: 13.5px; }
-
-    /* ============================================================
-       CONTACTO — solo info, sin formulario
-    ============================================================ */
-    .contact { padding: var(--pad); background: var(--white); }
-    .contact-inner {
-      max-width: var(--max); margin: 0 auto; padding: 0 28px;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
-    }
-    .contact-content .eyebrow { margin-bottom: 14px; }
-    .contact-content h2 { margin-bottom: 14px; }
-    .contact-content > p { margin-bottom: 0; }
-
-    .contact-cards { display: flex; flex-direction: column; gap: 14px; margin-top: 32px; }
-    .ccard {
-      display: flex; align-items: center; gap: 18px;
-      padding: 20px 22px; background: var(--gold-pale);
-      border: 1px solid var(--gold-border); border-radius: var(--r-md);
-      transition: border-color var(--ease);
-    }
-    .ccard:hover { border-color: var(--gold); }
-    .ccard-icon {
-      width: 44px; height: 44px; border-radius: 11px;
-      background: var(--gold-wash); border: 1px solid var(--gold-border);
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .ccard-icon svg {
-      width: 20px; height: 20px;
-      fill: none; stroke: var(--warm-mid);
-      stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
-    }
-    .ccard-label { font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--warm-light); margin-bottom: 2px; }
-    .ccard-value { font-size: 14.5px; font-weight: 500; color: var(--warm-dark); }
-
-    /* Panel visual derecho */
-    .contact-panel {
-      background: var(--gold-wash); border-radius: var(--r-lg);
-      border: 1px solid var(--gold-border); padding: 38px 34px;
-      display: flex; flex-direction: column; gap: 26px;
-    }
-    .cpanel-title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; color: var(--warm-dark); margin-bottom: 4px; }
-    .cpanel-sub   { font-size: 13.5px; color: var(--warm-mid); }
-
-    .map-block {
-      background: var(--white); border-radius: var(--r-md);
-      border: 1px solid var(--gold-border);
-      padding: 24px; display: flex; align-items: center; justify-content: center;
-    }
-    .map-block svg { width: 100%; max-width: 260px; height: auto; }
-
-    .schedule { display: flex; flex-direction: column; gap: 0; }
-    .sched-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 11px 0; border-bottom: 1px solid var(--gold-border);
-    }
-    .sched-row:last-child { border-bottom: none; }
-    .sched-day  { font-size: 13px; font-weight: 500; color: var(--warm-dark); }
-    .sched-time { font-size: 13px; color: var(--warm-mid); }
-
-    /* ============================================================
-       FOOTER
-    ============================================================ */
-    .footer { background: var(--warm-dark); padding: 60px 0 30px; }
-    .footer-inner { max-width: var(--max); margin: 0 auto; padding: 0 28px; }
-    .footer-top {
-      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
-      padding-bottom: 44px; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 28px;
-    }
-    .footer-logo svg { height: 50px; width: auto; margin-bottom: 14px; }
-    .footer-brand p { font-size: 13px; color: rgba(240,223,160,0.42); line-height: 1.65; max-width: 250px; }
-    .fcol-title { font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); opacity: 0.75; margin-bottom: 18px; }
-    .flinks { list-style: none; display: flex; flex-direction: column; gap: 11px; }
-    .flinks a { font-size: 13.5px; color: rgba(240,223,160,0.42); transition: color var(--ease); }
-    .flinks a:hover { color: var(--gold-light); }
-    .flinks li { font-size: 13.5px; color: rgba(240,223,160,0.42); }
-    .footer-bottom {
-      display: flex; justify-content: space-between;
-      font-size: 12px; color: rgba(255,255,255,0.2);
-    }
-
-    /* ============================================================
-       REVEAL
-    ============================================================ */
-    .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.65s ease, transform 0.65s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* ============================================================
-       RESPONSIVE
-    ============================================================ */
-    @media (max-width: 1024px) {
-      .hero-inner       { grid-template-columns: 1fr; gap: 44px; padding-top: 60px; }
-      .hero-panel       { max-width: 480px; }
-      .about-inner      { grid-template-columns: 1fr; gap: 44px; }
-      .about-graphic    { aspect-ratio: auto; min-height: 280px; }
-      .prod-header      { grid-template-columns: 1fr; gap: 16px; }
-      .prod-grid        { grid-template-columns: 1fr 1fr; }
-      .pcard.feat       { grid-column: span 2; }
-      .steps            { grid-template-columns: 1fr 1fr; gap: 40px; }
-      .steps::before    { display: none; }
-      .proc-header      { grid-template-columns: 1fr; gap: 16px; }
-      .why-grid         { grid-template-columns: 1fr 1fr; }
-      .contact-inner    { grid-template-columns: 1fr; gap: 44px; }
-      .footer-top       { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 768px) {
-      h1 { font-size: 2.2rem; } h2 { font-size: 1.7rem; }
-      .nav-links { display: none; }
-      .hamburger { display: flex; }
-      .prod-grid  { grid-template-columns: 1fr; }
-      .pcard.feat { grid-column: span 1; flex-direction: column; }
-      .pcard.feat .pcard-img { width: 100%; min-height: 180px; }
-      .why-grid   { grid-template-columns: 1fr; }
-      .footer-top { grid-template-columns: 1fr; gap: 30px; }
-      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
-    }
-    @media (max-width: 480px) {
-      .hero-actions { flex-direction: column; }
-      .hero-actions .btn { width: 100%; justify-content: center; }
-    }
-  </style>
-</head>
-<body>
-
-<!-- ============================================================
-     NAVBAR
-============================================================ -->
-<header class="navbar">
-  <div class="nav-inner">
-
-    <!-- Logo navbar: fondo #e7de99, montaña dorada, texto negro — idéntico al logo adjunto -->
-    <a href="#inicio" class="nav-logo">
-      <svg viewBox="0 0 240 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="240" height="80" fill="#e7de99" rx="6"/>
-        <!-- Pico izquierdo -->
-        <path d="M22 66 L52 22 L68 40 L88 66 Z" fill="#d4a843"/>
-        <!-- Pico central (más alto) -->
-        <path d="M56 66 L98 6 L140 66 Z" fill="#d4a843"/>
-        <!-- Sombra interna pico central -->
-        <path d="M98 6 L116 30 L98 24 Z" fill="#b8892e" opacity="0.5"/>
-        <!-- Pico derecho -->
-        <path d="M118 66 L138 32 L154 48 L172 66 Z" fill="#d4a843"/>
-        <!-- Texto Mets — negro, bold, itálica sans como en el logo real -->
-        <text x="206" y="58" font-family="'DM Sans',Arial,sans-serif" font-size="38" font-weight="700" font-style="italic" fill="#111110" text-anchor="middle">Mets</text>
-      </svg>
-    </a>
-
-    <nav aria-label="Navegación principal">
-      <ul class="nav-links">
-        <li><a href="#nosotros">Nosotros</a></li>
-        <li><a href="#productos">Productos</a></li>
-        <li><a href="#proceso">Proceso</a></li>
-        <li><a href="#contacto">Contacto</a></li>
-      </ul>
-    </nav>
-
-    <div style="display:flex;align-items:center;gap:10px;">
-      <a href="#contacto" class="btn btn-dark" style="padding:10px 18px;font-size:13px;">Contactarnos</a>
-      <button class="hamburger" id="ham" aria-label="Abrir menú">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </div>
-
-  <nav class="mobile-nav" id="mobNav">
-    <ul>
-      <li><a href="#nosotros" class="mlink">Nosotros</a></li>
-      <li><a href="#productos" class="mlink">Productos</a></li>
-      <li><a href="#proceso" class="mlink">Proceso</a></li>
-      <li><a href="#contacto" class="mlink">Contacto</a></li>
-    </ul>
-  </nav>
-</header>
-
-
-<!-- ============================================================
-     HERO
-============================================================ -->
-<section class="hero" id="inicio">
-  <div class="hero-inner">
-
-    <div>
-      <!-- Logo grande hero: fondo #e7de99, montaña BLANCA, texto negro -->
-      <div class="hero-logo">
-        <svg viewBox="0 0 320 108" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="320" height="108" fill="#e7de99" rx="10"/>
-          <!-- Pico izquierdo -->
-          <path d="M26 90 L66 28 L86 52 L114 90 Z" fill="white"/>
-          <!-- Pico central -->
-          <path d="M76 90 L128 8 L180 90 Z" fill="white"/>
-          <!-- Sombra interna pico central -->
-          <path d="M128 8 L150 38 L128 32 Z" fill="rgba(0,0,0,0.09)"/>
-          <!-- Pico derecho -->
-          <path d="M156 90 L180 46 L198 62 L220 90 Z" fill="white"/>
-          <!-- Texto Mets -->
-          <text x="272" y="82" font-family="'DM Sans',Arial,sans-serif" font-size="56" font-weight="800" font-style="italic" fill="#111110" text-anchor="middle">Mets</text>
-        </svg>
-      </div>
-
-      <p class="eyebrow" style="margin-bottom:14px;">Insumos Vitivinícolas · Mendoza, Argentina</p>
-      <h1>Pureza en cada<br>etapa del <em>vino</em></h1>
-      <p class="hero-lead">
-        Somos especialistas en la producción y comercialización de bitartrato de potasio
-        y cremor tártaro — insumos esenciales para bodegas y la industria alimentaria.
-        Atención directa y producto de origen natural.
-      </p>
-      <div class="hero-actions">
-        <a href="#productos" class="btn btn-dark">Ver productos</a>
-        <a href="#contacto"  class="btn btn-outline">Hablar con nosotros</a>
-      </div>
-    </div>
-
-    <!-- Panel de productos -->
-    <div class="hero-panel">
-      <p class="hero-panel-label">Catálogo de productos</p>
-      <ul class="panel-list">
-        <li class="panel-item">
-          <span class="panel-dot"></span>
-          <div>
-            <div class="panel-name">Bitartrato de Potasio</div>
-            <div class="panel-sub">Grado enológico y técnico</div>
-          </div>
-        </li>
-        <li class="panel-item">
-          <span class="panel-dot"></span>
-          <div>
-            <div class="panel-name">Cremor Tártaro</div>
-            <div class="panel-sub">Grado alimentario certificado</div>
-          </div>
-        </li>
-        <li class="panel-item">
-          <span class="panel-dot"></span>
-          <div>
-            <div class="panel-name">Mosto de Uva</div>
-            <div class="panel-sub">Concentrado y sulfitado</div>
-          </div>
-        </li>
-        <li class="panel-item">
-          <span class="panel-dot"></span>
-          <div>
-            <div class="panel-name">Maquinaria Vitivinícola</div>
-            <div class="panel-sub">Equipos y asesoramiento técnico</div>
-          </div>
-        </li>
-      </ul>
-    </div>
-
-  </div>
-</section>
-
-
-<!-- ============================================================
-     MARQUEE
-============================================================ -->
-<div class="strip" aria-hidden="true">
-  <div class="strip-track">
-    <span class="strip-item"><span class="strip-sep"></span>Bitartrato de Potasio</span>
-    <span class="strip-item"><span class="strip-sep"></span>Cremor Tártaro</span>
-    <span class="strip-item"><span class="strip-sep"></span>Mosto de Uva</span>
-    <span class="strip-item"><span class="strip-sep"></span>Maquinaria Vitivinícola</span>
-    <span class="strip-item"><span class="strip-sep"></span>Insumos Enológicos</span>
-    <span class="strip-item"><span class="strip-sep"></span>Industria Alimentaria</span>
-    <span class="strip-item"><span class="strip-sep"></span>Mendoza · Argentina</span>
-    <span class="strip-item"><span class="strip-sep"></span>Bitartrato de Potasio</span>
-    <span class="strip-item"><span class="strip-sep"></span>Cremor Tártaro</span>
-    <span class="strip-item"><span class="strip-sep"></span>Mosto de Uva</span>
-    <span class="strip-item"><span class="strip-sep"></span>Maquinaria Vitivinícola</span>
-    <span class="strip-item"><span class="strip-sep"></span>Insumos Enológicos</span>
-    <span class="strip-item"><span class="strip-sep"></span>Industria Alimentaria</span>
-    <span class="strip-item"><span class="strip-sep"></span>Mendoza · Argentina</span>
-  </div>
-</div>
-
-
-<!-- ============================================================
-     NOSOTROS
-============================================================ -->
-<section class="about" id="nosotros">
-  <div class="about-inner">
-
-    <div class="reveal">
-      <div class="about-graphic">
-        <!-- Logo mediano: fondo #e7de99, montaña blanca -->
-        <div class="about-logo">
-          <svg viewBox="0 0 260 88" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="260" height="88" fill="#e7de99" rx="8"/>
-            <path d="M20 72 L52 22 L70 42 L94 72 Z" fill="white"/>
-            <path d="M62 72 L106 8 L150 72 Z" fill="white"/>
-            <path d="M106 8 L124 34 L106 28 Z" fill="rgba(0,0,0,0.09)"/>
-            <path d="M126 72 L148 38 L164 52 L182 72 Z" fill="white"/>
-            <text x="220" y="66" font-family="'DM Sans',Arial,sans-serif" font-size="44" font-weight="800" font-style="italic" fill="#111110" text-anchor="middle">Mets</text>
-          </svg>
-        </div>
-        <p class="about-tagline">Insumos para la industria<br>vitivinícola argentina</p>
-        <div class="about-chip">
-          <div class="about-chip-title">Mendoza</div>
-          <div class="about-chip-sub">Capital vitivinícola de Argentina</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="about-content reveal">
-      <p class="eyebrow">Sobre METS</p>
-      <h2>Especialistas en insumos para la industria del vino</h2>
-      <p>
-        METS nació con el propósito de abastecer a bodegas y productores vitivinícolas con
-        insumos de alta calidad. Con base en Mendoza — la región vinícola más importante de
-        Argentina — conocemos de cerca las necesidades del sector y ofrecemos soluciones concretas.
-      </p>
-      <p>
-        Nos especializamos en la producción y comercialización de bitartrato de potasio y cremor
-        tártaro, derivados naturales del proceso de elaboración del vino, con aplicaciones enológicas
-        y alimentarias. Complementamos nuestra oferta con mosto de uva y, cuando el proyecto lo
-        requiere, equipos y maquinaria vitivinícola.
-      </p>
-      <div class="pillars">
-        <div class="pillar">
-          <div class="pillar-bar"></div>
-          <div>
-            <div class="pillar-title">Materia prima regional</div>
-            <div class="pillar-text">Trabajamos con subproductos de la fermentación de uva mendocina, con trazabilidad desde el origen.</div>
-          </div>
-        </div>
-        <div class="pillar">
-          <div class="pillar-bar"></div>
-          <div>
-            <div class="pillar-title">Producto de origen natural</div>
-            <div class="pillar-text">Insumos libres de aditivos artificiales, con la pureza que exige la enología y la industria alimentaria.</div>
-          </div>
-        </div>
-        <div class="pillar">
-          <div class="pillar-bar"></div>
-          <div>
-            <div class="pillar-title">Trato directo y ágil</div>
-            <div class="pillar-text">Atención personalizada, respuesta rápida y adaptación a las necesidades específicas de cada cliente.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-
-<!-- ============================================================
-     PRODUCTOS
-============================================================ -->
-<section class="products" id="productos">
-  <div class="prod-inner">
-
-    <div class="prod-header">
-      <div class="reveal">
-        <p class="eyebrow">Nuestros productos</p>
-        <h2>Lo que ofrecemos</h2>
-      </div>
-      <div class="reveal">
-        <p>Desde insumos enológicos fundamentales hasta equipamiento vitivinícola, cubrimos las necesidades de bodegas, industrias alimentarias y elaboradores.</p>
-      </div>
-    </div>
-
-    <div class="prod-grid">
-
-      <!-- FEATURED: Bitartrato -->
-      <div class="pcard feat reveal">
-        <div class="pcard-img" style="background:linear-gradient(135deg,#f5edcc,#e7de99);">
-          <svg class="pcard-icon" viewBox="0 0 64 64" fill="none">
-            <polygon points="32,4 56,20 56,44 32,60 8,44 8,20" stroke="#d4a843" stroke-width="2.5" fill="rgba(212,168,67,0.10)"/>
-            <polygon points="32,14 46,22 46,38 32,46 18,38 18,22" stroke="#d4a843" stroke-width="1.5" fill="rgba(212,168,67,0.07)"/>
-            <line x1="8" y1="20" x2="32" y2="14" stroke="#d4a843" stroke-width="1.2"/>
-            <line x1="56" y1="20" x2="32" y2="14" stroke="#d4a843" stroke-width="1.2"/>
-            <line x1="32" y1="4"  x2="32" y2="14" stroke="#d4a843" stroke-width="1.2"/>
-          </svg>
-          <span class="pcard-badge">Producto principal</span>
-        </div>
-        <div class="pcard-body">
-          <p class="pcard-cat">Insumo enológico</p>
-          <h3>Bitartrato de Potasio (Tártaro)</h3>
-          <p>
-            El bitartrato de potasio — conocido como tártaro — es un subproducto natural de la
-            fermentación de la uva. Lo recuperamos y procesamos para obtener un producto de alta
-            pureza con múltiples aplicaciones: estabilización de vinos, regulador de acidez en la
-            industria alimentaria y usos industriales en general.
-            <br><br>
-            Disponible en diferentes granulometrías y presentaciones según el volumen requerido.
-          </p>
-          <div class="card-tags">
-            <span class="ctag">Alta pureza</span>
-            <span class="ctag">Grado enológico</span>
-            <span class="ctag">Grado técnico</span>
-            <span class="ctag">Fraccionado</span>
-            <span class="ctag">A granel</span>
-          </div>
-          <a href="#contacto" class="card-cta">Consultar disponibilidad &rarr;</a>
-        </div>
-      </div>
-
-      <!-- Cremor Tártaro -->
-      <div class="pcard reveal">
-        <div class="pcard-img" style="background:linear-gradient(135deg,#eef5e6,#dce6cc);">
-          <svg class="pcard-icon" viewBox="0 0 64 64" fill="none">
-            <rect x="22" y="8" width="20" height="8" rx="3" stroke="#5a6e3a" stroke-width="2"/>
-            <path d="M22 14 L16 52 Q16 56 20 56 H44 Q48 56 48 52 L42 14 Z" stroke="#5a6e3a" stroke-width="2" fill="rgba(90,110,58,0.08)"/>
-            <path d="M18 40 Q25 36 32 40 Q39 44 46 40" stroke="#5a6e3a" stroke-width="1.5"/>
-          </svg>
-          <span class="pcard-badge">Producto principal</span>
-        </div>
-        <div class="pcard-body">
-          <p class="pcard-cat">Industria alimentaria</p>
-          <h3>Cremor Tártaro</h3>
-          <p>
-            Sal purificada del ácido tartárico con amplia aplicación en pastelería, panadería
-            y elaboración de alimentos. Distribuimos producto certificado de grado alimentario
-            en presentaciones para uso industrial y comercial.
-          </p>
-          <div class="card-tags">
-            <span class="ctag">Grado alimentario</span>
-            <span class="ctag">E336</span>
-            <span class="ctag">Fraccionado</span>
-          </div>
-          <a href="#contacto" class="card-cta">Consultar disponibilidad &rarr;</a>
-        </div>
-      </div>
-
-      <!-- Mosto -->
-      <div class="pcard reveal">
-        <div class="pcard-img" style="background:linear-gradient(135deg,#f2e8f0,#e4d0e0);">
-          <svg class="pcard-icon" viewBox="0 0 64 64" fill="none">
-            <circle cx="24" cy="30" r="7" stroke="#8b5e7a" stroke-width="2" fill="rgba(139,94,122,0.09)"/>
-            <circle cx="40" cy="30" r="7" stroke="#8b5e7a" stroke-width="2" fill="rgba(139,94,122,0.09)"/>
-            <circle cx="32" cy="44" r="7" stroke="#8b5e7a" stroke-width="2" fill="rgba(139,94,122,0.09)"/>
-            <circle cx="24" cy="44" r="7" stroke="#8b5e7a" stroke-width="1.5" fill="rgba(139,94,122,0.06)"/>
-            <circle cx="40" cy="44" r="7" stroke="#8b5e7a" stroke-width="1.5" fill="rgba(139,94,122,0.06)"/>
-            <path d="M32 22 L32 10 Q36 8 40 10" stroke="#8b5e7a" stroke-width="1.8" fill="none"/>
-          </svg>
-        </div>
-        <div class="pcard-body">
-          <p class="pcard-cat">Subproducto vitivinícola</p>
-          <h3>Mosto de Uva</h3>
-          <p>
-            Comercializamos mosto concentrado y mosto sulfitado proveniente de las principales
-            regiones vitivinícolas de Mendoza. Ideal para productores, industrias y exportación.
-          </p>
-          <div class="card-tags">
-            <span class="ctag">Concentrado</span>
-            <span class="ctag">Sulfitado</span>
-          </div>
-          <a href="#contacto" class="card-cta">Consultar &rarr;</a>
-        </div>
-      </div>
-
-      <!-- Maquinaria -->
-      <div class="pcard reveal">
-        <div class="pcard-img" style="background:linear-gradient(135deg,#eeecea,#dddad2);">
-          <svg class="pcard-icon" viewBox="0 0 64 64" fill="none">
-            <circle cx="32" cy="32" r="10" stroke="#5c4e32" stroke-width="2.2" fill="rgba(92,78,50,0.07)"/>
-            <circle cx="32" cy="32" r="4" fill="#5c4e32" opacity="0.28"/>
-            <path d="M32 8 L34 16 L30 16 Z M32 56 L34 48 L30 48 Z M8 32 L16 34 L16 30 Z M56 32 L48 34 L48 30 Z" fill="#5c4e32" opacity="0.5"/>
-            <path d="M13 13 L19 20 L16 23 Z M51 51 L45 44 L48 41 Z M51 13 L44 19 L41 16 Z M13 51 L20 45 L23 48 Z" fill="#5c4e32" opacity="0.32"/>
-          </svg>
-        </div>
-        <div class="pcard-body">
-          <p class="pcard-cat">Equipamiento</p>
-          <h3>Maquinaria Vitivinícola</h3>
-          <p>
-            Gestionamos la compra y venta de equipos y maquinaria para bodega de manera
-            complementaria. Asesoramos en la selección según la escala y necesidades de
-            cada proyecto.
-          </p>
-          <div class="card-tags">
-            <span class="ctag">Consultar disponibilidad</span>
-          </div>
-          <a href="#contacto" class="card-cta">Consultar &rarr;</a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-<!-- ============================================================
-     PROCESO
-============================================================ -->
-<section class="process" id="proceso">
-  <div class="proc-inner">
-
-    <div class="proc-header reveal">
-      <div>
-        <p class="eyebrow">Cómo trabajamos</p>
-        <h2>Un proceso orientado a la calidad</h2>
-      </div>
-      <div>
-        <p>Desde la materia prima hasta la entrega, cada etapa está pensada para asegurar consistencia y pureza en el producto final.</p>
-      </div>
-    </div>
-
-    <div class="steps">
-      <div class="step reveal">
-        <div class="step-num">01</div>
-        <div class="step-title">Recolección de materia prima</div>
-        <div class="step-text">Trabajamos con bodegas seleccionadas de Mendoza para obtener heces tartáricas y subproductos de fermentación de alta calidad.</div>
-      </div>
-      <div class="step reveal">
-        <div class="step-num">02</div>
-        <div class="step-title">Procesamiento y purificación</div>
-        <div class="step-text">Aplicamos procesos controlados de disolución, filtración y cristalización para alcanzar los niveles de pureza requeridos por cada aplicación.</div>
-      </div>
-      <div class="step reveal">
-        <div class="step-num">03</div>
-        <div class="step-title">Control analítico</div>
-        <div class="step-text">Cada lote es analizado fisicoquímicamente para verificar su composición y adecuación a los estándares enológicos y alimentarios vigentes.</div>
-      </div>
-      <div class="step reveal">
-        <div class="step-num">04</div>
-        <div class="step-title">Distribución y entrega</div>
-        <div class="step-text">Coordinamos fraccionado, embalaje y despacho en todo el país, con logística adaptada al volumen y destino de cada operación.</div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-
-<!-- ============================================================
-     POR QUE ELEGIRNOS
-============================================================ -->
-<section class="why" id="por-que">
-  <div class="why-inner">
-
-    <div class="why-header reveal">
-      <p class="eyebrow">Por qué elegirnos</p>
-      <h2>Un proveedor con propósito</h2>
-      <p>Conocimiento del sector, producto de origen natural y atención directa sin intermediarios.</p>
-    </div>
-
-    <div class="why-grid">
-      <div class="wcard reveal">
-        <div class="wbar"></div>
-        <h3>Producto de origen natural</h3>
-        <p>Insumos derivados directamente del proceso vitivinícola, libres de aditivos, con la pureza que exige la enología y la industria alimentaria.</p>
-      </div>
-      <div class="wcard reveal">
-        <div class="wbar"></div>
-        <h3>Presentaciones flexibles</h3>
-        <p>Trabajamos con pequeñas cantidades fraccionadas y con volúmenes industriales a granel, adaptándonos a la escala de cada proyecto.</p>
-      </div>
-      <div class="wcard reveal">
-        <div class="wbar"></div>
-        <h3>Documentación analítica</h3>
-        <p>Cada despacho incluye el respaldo técnico que acredita la composición y pureza del producto. Transparencia en cada operación.</p>
-      </div>
-      <div class="wcard reveal">
-        <div class="wbar"></div>
-        <h3>Cobertura nacional</h3>
-        <p>Distribuimos en todo el territorio argentino y gestionamos exportaciones cuando el proyecto lo requiere.</p>
-      </div>
-      <div class="wcard reveal">
-        <div class="wbar"></div>
-        <h3>Conocimiento del sector</h3>
-        <p>Trabajamos exclusivamente en la industria vitivinícola y alimentaria, lo que nos permite entender los tiempos y estándares de nuestros clientes.</p>
-      </div>
-      <div class="wcard reveal">
-        <div class="wbar"></div>
-        <h3>Atención directa</h3>
-        <p>Sin intermediarios. Un equipo disponible para responder consultas, coordinar entregas y acompañar cada proceso con trato personalizado.</p>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-
-<!-- ============================================================
-     CONTACTO — solo información, sin formulario
-============================================================ -->
-<section class="contact" id="contacto">
-  <div class="contact-inner">
-
-    <div class="contact-content reveal">
-      <p class="eyebrow">Contacto</p>
-      <h2>Hablemos</h2>
-      <p>Estamos disponibles para consultas sobre productos, presentaciones, precios y logística. Comuníquese por el canal que le resulte más cómodo.</p>
-
-      <div class="contact-cards">
-
-        <div class="ccard">
-          <div class="ccard-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-              <circle cx="12" cy="9" r="2.5"/>
-            </svg>
-          </div>
-          <div>
-            <div class="ccard-label">Ubicación</div>
-            <div class="ccard-value">Mendoza, Argentina</div>
-          </div>
-        </div>
-
-        <div class="ccard">
-          <div class="ccard-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
-            </svg>
-          </div>
-          <div>
-            <div class="ccard-label">Teléfono / WhatsApp</div>
-            <div class="ccard-value">+54 261 XXX XXXX</div>
-          </div>
-        </div>
-
-        <div class="ccard">
-          <div class="ccard-icon">
-            <svg viewBox="0 0 24 24">
-              <rect x="2" y="4" width="20" height="16" rx="2"/>
-              <path d="M2 8l10 6 10-6"/>
-            </svg>
-          </div>
-          <div>
-            <div class="ccard-label">Email comercial</div>
-            <div class="ccard-value">ventas@mets.com.ar</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Panel visual -->
-    <div class="contact-panel reveal">
-      <div>
-        <div class="cpanel-title">Zona de operaciones</div>
-        <div class="cpanel-sub">Producción y distribución desde Mendoza hacia todo el país</div>
-      </div>
-
-      <!-- Ilustración estilizada mapa Argentina -->
-      <div class="map-block">
-        <svg viewBox="0 0 260 190" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M104 10 L142 8 L160 22 L164 44 L152 60 L156 80 L150 102 L154 126 L146 148 L140 168 L130 182 L120 176 L116 156 L118 138 L112 118 L106 100 L110 80 L102 62 L98 44 L108 28 Z"
-            fill="rgba(212,168,67,0.14)" stroke="#e0cc88" stroke-width="1.5"/>
-          <!-- Punto Mendoza -->
-          <circle cx="114" cy="114" r="7"  fill="#d4a843" opacity="0.85"/>
-          <circle cx="114" cy="114" r="14" fill="#d4a843" opacity="0.14"/>
-          <!-- Rutas distribución -->
-          <line x1="114" y1="114" x2="144" y2="58"  stroke="#d4a843" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.4"/>
-          <line x1="114" y1="114" x2="136" y2="148" stroke="#d4a843" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.4"/>
-          <line x1="114" y1="114" x2="96"  y2="78"  stroke="#d4a843" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.35"/>
-          <circle cx="144" cy="58"  r="3.5" fill="#9e8756" opacity="0.6"/>
-          <circle cx="136" cy="148" r="3.5" fill="#9e8756" opacity="0.6"/>
-          <circle cx="96"  cy="78"  r="3.5" fill="#9e8756" opacity="0.5"/>
-          <text x="126" y="116" font-family="'DM Sans',sans-serif" font-size="9" fill="#2c2416" font-weight="600">Mendoza</text>
-        </svg>
-      </div>
-
-      <!-- Horarios -->
-      <div class="schedule">
-        <div class="sched-row">
-          <span class="sched-day">Lunes a Viernes</span>
-          <span class="sched-time">8:00 — 17:00 hs</span>
-        </div>
-        <div class="sched-row">
-          <span class="sched-day">Sábados</span>
-          <span class="sched-time">8:00 — 12:00 hs</span>
-        </div>
-        <div class="sched-row">
-          <span class="sched-day">Domingos y feriados</span>
-          <span class="sched-time">Sin atención</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-
-<!-- ============================================================
-     FOOTER
-============================================================ -->
-<footer class="footer">
-  <div class="footer-inner">
-    <div class="footer-top">
-
-      <div class="footer-brand">
-        <!-- Logo footer: versión oscura — fondo cálido oscuro, montaña dorada -->
-        <div class="footer-logo">
-          <svg viewBox="0 0 240 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="240" height="80" fill="#3a2f1a" rx="6"/>
-            <path d="M22 66 L52 22 L68 40 L88 66 Z" fill="#d4a843"/>
-            <path d="M56 66 L98 6 L140 66 Z" fill="#d4a843"/>
-            <path d="M98 6 L116 30 L98 24 Z" fill="#b8892e" opacity="0.5"/>
-            <path d="M118 66 L138 32 L154 48 L172 66 Z" fill="#d4a843"/>
-            <text x="206" y="58" font-family="'DM Sans',Arial,sans-serif" font-size="38" font-weight="700" font-style="italic" fill="#f0dfa0" text-anchor="middle">Mets</text>
-          </svg>
-        </div>
-        <p>Especialistas en bitartrato de potasio, cremor tártaro e insumos para la industria vitivinícola. Mendoza, Argentina.</p>
-      </div>
-
-      <div>
-        <div class="fcol-title">Productos</div>
-        <ul class="flinks">
-          <li><a href="#productos">Bitartrato de Potasio</a></li>
-          <li><a href="#productos">Cremor Tártaro</a></li>
-          <li><a href="#productos">Mosto de Uva</a></li>
-          <li><a href="#productos">Maquinaria Vitivinícola</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <div class="fcol-title">Empresa</div>
-        <ul class="flinks">
-          <li><a href="#nosotros">Sobre METS</a></li>
-          <li><a href="#proceso">Nuestro proceso</a></li>
-          <li><a href="#por-que">Por qué elegirnos</a></li>
-          <li><a href="#contacto">Contacto</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <div class="fcol-title">Contacto</div>
-        <ul class="flinks">
-          <li><a href="mailto:ventas@mets.com.ar">ventas@mets.com.ar</a></li>
-          <li><a href="tel:+542610000000">+54 261 XXX XXXX</a></li>
-          <li>Mendoza, Argentina</li>
-          <li>Lun–Vie 8:00 a 17:00 hs</li>
-        </ul>
-      </div>
-
-    </div>
-    <div class="footer-bottom">
-      <span>&copy; 2025 METS. Todos los derechos reservados.</span>
-      <span>Industria vitivinícola argentina</span>
-    </div>
-  </div>
-</footer>
-
-
-<!-- ============================================================
-     JAVASCRIPT — solo comportamiento visual (menú + reveal)
-============================================================ -->
-<script>
-  document.getElementById('ham').addEventListener('click', function() {
-    document.getElementById('mobNav').classList.toggle('open');
-  });
-  document.querySelectorAll('.mlink').forEach(function(el) {
-    el.addEventListener('click', function() {
-      document.getElementById('mobNav').classList.remove('open');
-    });
-  });
-
-  var obs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) {
-        var siblings = Array.from(entry.target.parentElement.querySelectorAll('.reveal'));
-        var idx = siblings.indexOf(entry.target);
-        entry.target.style.transitionDelay = (idx * 0.07) + 's';
-        entry.target.classList.add('visible');
-        obs.unobserve(entry.target);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>METS — Insumos Vitivinícolas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --gold: #d4a843;
+        --gold-light: #f0dfa0;
+        --gold-pale: #faf6e8;
+        --gold-wash: #f4edcc;
+        --gold-border: #e0cc88;
+        --warm-dark: #2c2416;
+        --warm-mid: #5c4e32;
+        --warm-light: #9e8756;
+        --warm-surface: #efe9d4;
+        --olive: #5a6e3a;
+        --white: #ffffff;
+        --logo-bg: #e7de99;
+        --font-display: "Playfair Display", Georgia, serif;
+        --font-body: "DM Sans", sans-serif;
+        --max: 1160px;
+        --pad: 100px 28px;
+        --r-sm: 6px;
+        --r-md: 14px;
+        --r-lg: 24px;
+        --ease: 0.3s ease;
       }
-    });
-  }, { threshold: 0.10 });
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: var(--font-body);
+        font-size: 16px;
+        line-height: 1.7;
+        color: var(--warm-dark);
+        background: var(--gold-pale);
+        -webkit-font-smoothing: antialiased;
+      }
+      img {
+        display: block;
+        max-width: 100%;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .eyebrow {
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--warm-light);
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: var(--font-display);
+        line-height: 1.18;
+        color: var(--warm-dark);
+      }
+      h1 {
+        font-size: clamp(2.3rem, 5vw, 3.8rem);
+        font-weight: 700;
+      }
+      h2 {
+        font-size: clamp(1.7rem, 3vw, 2.5rem);
+        font-weight: 600;
+      }
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      p {
+        color: var(--warm-mid);
+        line-height: 1.75;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 13px 26px;
+        font-family: var(--font-body);
+        font-size: 13.5px;
+        font-weight: 600;
+        border-radius: var(--r-sm);
+        cursor: pointer;
+        border: none;
+        transition: var(--ease);
+        letter-spacing: 0.02em;
+      }
+      .btn-dark {
+        background: var(--warm-dark);
+        color: var(--gold-light);
+      }
+      .btn-dark:hover {
+        background: var(--warm-mid);
+        transform: translateY(-1px);
+      }
+      .btn-outline {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        border: 1.5px solid rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(4px);
+      }
+      .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.25);
+      }
 
-  document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
-</script>
+      /* NAVBAR */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: var(--gold-pale);
+        border-bottom: 1px solid var(--gold-border);
+      }
+      .nav-inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0 28px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .nav-logo-wrap {
+        display: flex;
+        align-items: center;
+        height: 48px;
+        background: var(--logo-bg);
+        border-radius: 8px;
+        overflow: hidden;
+        padding: 0 6px;
+      }
+      .nav-logo-wrap img {
+        height: 42px;
+        width: auto;
+        object-fit: contain;
+      }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 36px;
+        list-style: none;
+      }
+      .nav-links a {
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--warm-mid);
+        position: relative;
+        transition: color var(--ease);
+      }
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 0;
+        height: 1.5px;
+        background: var(--gold);
+        transition: width var(--ease);
+      }
+      .nav-links a:hover {
+        color: var(--warm-dark);
+      }
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+      }
+      .hamburger span {
+        display: block;
+        width: 24px;
+        height: 2px;
+        background: var(--warm-dark);
+        border-radius: 2px;
+      }
+      .mobile-nav {
+        display: none;
+        background: var(--gold-wash);
+        padding: 20px 28px 28px;
+        border-top: 1px solid var(--gold-border);
+      }
+      .mobile-nav.open {
+        display: block;
+      }
+      .mobile-nav ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .mobile-nav a {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--warm-dark);
+      }
 
-</body>
+      /* HERO */
+      .hero {
+        padding-top: 70px;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        background-image: url("./assets/img/image\ \(2\).jpg");
+        background-size: cover;
+        background-position: center center;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(20, 14, 5, 0.75) 0%,
+          rgba(30, 20, 8, 0.58) 60%,
+          rgba(44, 36, 22, 0.48) 100%
+        );
+        pointer-events: none;
+      }
+      .hero-inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 80px 28px 100px;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 72px;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+      }
+      /* Logo hero — bigger, beautiful presentation */
+      .hero-logo {
+        margin-bottom: 36px;
+        display: inline-block;
+      }
+      .hero-logo-inner {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .hero-logo-inner img {
+        height: 230px;
+        width: auto;
+        object-fit: contain;
+        display: block;
+      }
+      .hero h1 {
+        margin-bottom: 20px;
+        color: #fff;
+      }
+      .hero h1 em {
+        font-style: italic;
+        color: var(--gold);
+      }
+      .hero .eyebrow {
+        color: rgba(240, 223, 160, 0.75);
+      }
+      .hero-lead {
+        font-size: 1.06rem;
+        color: rgba(240, 223, 160, 0.75);
+        margin-bottom: 38px;
+        max-width: 490px;
+      }
+      .hero-actions {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .hero-panel {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: var(--r-lg);
+        border: 1px solid rgba(224, 204, 136, 0.35);
+        padding: 34px 30px;
+        backdrop-filter: blur(12px);
+      }
+      .hero-panel-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(240, 223, 160, 0.65);
+        margin-bottom: 18px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(224, 204, 136, 0.25);
+      }
+      .panel-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .panel-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: var(--r-sm);
+        border: 1px solid rgba(224, 204, 136, 0.2);
+      }
+      .panel-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--gold);
+        flex-shrink: 0;
+      }
+      .panel-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+      }
+      .panel-sub {
+        font-size: 12px;
+        color: rgba(240, 223, 160, 0.6);
+      }
+
+      /* STRIP */
+      .strip {
+        background: var(--warm-dark);
+        padding: 14px 0;
+        overflow: hidden;
+      }
+      .strip-track {
+        display: flex;
+        gap: 60px;
+        animation: marquee 26s linear infinite;
+        white-space: nowrap;
+      }
+      .strip-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--gold-light);
+        flex-shrink: 0;
+      }
+      .strip-sep {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--gold);
+        flex-shrink: 0;
+      }
+      @keyframes marquee {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* ABOUT */
+      .about {
+        padding: var(--pad);
+        background: var(--white);
+      }
+      .about-inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0 28px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: center;
+      }
+      .about-graphic {
+        width: 100%;
+        aspect-ratio: 5/6;
+        border-radius: var(--r-lg);
+        border: 1px solid var(--gold-border);
+        overflow: hidden;
+        position: relative;
+        background-image: url("./assets/img/image (4).jpg");
+        background-size: cover;
+        background-position: center;
+      }
+      .about-chip {
+        position: absolute;
+        bottom: 24px;
+        right: 24px;
+        background: var(--warm-dark);
+        border-radius: var(--r-md);
+        padding: 16px 20px;
+        z-index: 2;
+      }
+      .about-chip-title {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--gold-light);
+        margin-bottom: 2px;
+      }
+      .about-chip-sub {
+        font-size: 11px;
+        color: rgba(240, 223, 160, 0.55);
+      }
+      .about-content .eyebrow {
+        margin-bottom: 14px;
+      }
+      .about-content h2 {
+        margin-bottom: 18px;
+      }
+      .about-content > p {
+        margin-bottom: 18px;
+      }
+      .pillars {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .pillar {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 18px 20px;
+        border: 1px solid var(--gold-border);
+        border-radius: var(--r-md);
+        background: var(--gold-pale);
+        transition:
+          border-color var(--ease),
+          background var(--ease);
+      }
+      .pillar:hover {
+        border-color: var(--gold);
+        background: var(--gold-wash);
+      }
+      .pillar-bar {
+        width: 3px;
+        height: 36px;
+        border-radius: 3px;
+        background: var(--gold);
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .pillar-title {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--warm-dark);
+        margin-bottom: 3px;
+      }
+      .pillar-text {
+        font-size: 13px;
+        color: var(--warm-mid);
+        line-height: 1.55;
+      }
+
+      /* PRODUCTS */
+      .products {
+        padding: var(--pad);
+        background: var(--gold-pale);
+      }
+      .prod-inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0 28px;
+      }
+      .prod-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+        align-items: end;
+        margin-bottom: 52px;
+      }
+      .prod-header .eyebrow {
+        margin-bottom: 12px;
+      }
+      .prod-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      .pcard {
+        background: var(--white);
+        border-radius: var(--r-lg);
+        border: 1px solid var(--gold-border);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition:
+          transform var(--ease),
+          border-color var(--ease);
+      }
+      .pcard:hover {
+        transform: translateY(-4px);
+        border-color: var(--gold);
+      }
+      .pcard.feat {
+        grid-column: span 3;
+        flex-direction: row;
+      }
+      .pcard-img {
+        position: relative;
+        flex-shrink: 0;
+        overflow: hidden;
+        min-height: 200px;
+      }
+      .pcard-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+        display: block;
+      }
+      /* tartaro – nudge up a bit so the chunky pieces center better */
+      .pcard-img img.tartaro-img {
+        object-position: center 30%;
+      }
+      .pcard.feat .pcard-img {
+        width: 36%;
+        min-height: 340px;
+      }
+      .pcard-badge {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        background: var(--warm-dark);
+        color: var(--gold-light);
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 4px;
+        z-index: 1;
+      }
+      .pcard-body {
+        padding: 26px 28px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+      .pcard h3 {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+      }
+      .pcard.feat h3 {
+        font-size: 1.45rem;
+      }
+      .pcard p {
+        font-size: 13.5px;
+        line-height: 1.65;
+        flex: 1;
+      }
+      .card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: 18px;
+      }
+      .ctag {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 11px;
+        background: var(--gold-wash);
+        color: var(--warm-mid);
+        border: 1px solid var(--gold-border);
+        border-radius: 50px;
+      }
+      .card-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 18px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--warm-dark);
+        transition: gap var(--ease);
+      }
+      .card-cta:hover {
+        gap: 9px;
+      }
+      .mosto-tipos {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 18px;
+      }
+      .mosto-tipo {
+        background: var(--gold-pale);
+        border: 1px solid var(--gold-border);
+        border-radius: var(--r-sm);
+        padding: 10px 12px;
+      }
+      .mosto-tipo-name {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--warm-dark);
+        margin-bottom: 3px;
+      }
+      .mosto-tipo-desc {
+        font-size: 11px;
+        color: var(--warm-mid);
+        line-height: 1.45;
+      }
+
+      /* PROCESS */
+      .process {
+        padding: var(--pad);
+        background: var(--warm-dark);
+      }
+      .proc-inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0 28px;
+      }
+      .proc-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 56px;
+        align-items: end;
+        margin-bottom: 64px;
+      }
+      .proc-header .eyebrow {
+        color: var(--gold-light);
+        opacity: 0.65;
+      }
+      .proc-header h2 {
+        color: var(--gold-light);
+      }
+      .proc-header p {
+        color: rgba(240, 223, 160, 0.45);
+      }
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        position: relative;
+      }
+      .steps::before {
+        content: "";
+        position: absolute;
+        top: 28px;
+        left: 8%;
+        right: 8%;
+        height: 1px;
+        background: rgba(212, 168, 67, 0.18);
+      }
+      .step {
+        padding-right: 24px;
+        position: relative;
+        z-index: 1;
+      }
+      .step-num {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(212, 168, 67, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--gold);
+        background: var(--warm-dark);
+        margin-bottom: 22px;
+      }
+      .step-title {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gold-light);
+        margin-bottom: 10px;
+      }
+      .step-text {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.4);
+        line-height: 1.65;
+      }
+
+      /* WHY — full background photo */
+      .why {
+        padding: var(--pad);
+        position: relative;
+        overflow: hidden;
+        background-image: url("./assets/img/image (5).jpg");
+        background-size: cover;
+        background-position: center 40%;
+      }
+      .why::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(20, 14, 5, 0.72) 0%,
+          rgba(30, 20, 8, 0.62) 50%,
+          rgba(20, 14, 5, 0.78) 100%
+        );
+        pointer-events: none;
+      }
+      .why-inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0 28px;
+        position: relative;
+        z-index: 1;
+      }
+      .why-header {
+        text-align: center;
+        max-width: 560px;
+        margin: 0 auto 56px;
+      }
+      .why-header .eyebrow {
+        margin-bottom: 12px;
+        color: rgba(240, 223, 160, 0.65);
+      }
+      .why-header h2 {
+        margin-bottom: 14px;
+        color: var(--gold-light);
+      }
+      .why-header > p {
+        color: rgba(240, 223, 160, 0.55);
+      }
+      .why-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .wcard {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: var(--r-lg);
+        padding: 30px 26px;
+        border: 1px solid rgba(224, 204, 136, 0.25);
+        backdrop-filter: blur(10px);
+        transition:
+          transform var(--ease),
+          border-color var(--ease),
+          background var(--ease);
+      }
+      .wcard:hover {
+        transform: translateY(-3px);
+        border-color: var(--gold);
+        background: rgba(255, 255, 255, 0.16);
+      }
+      .wbar {
+        width: 30px;
+        height: 3px;
+        background: var(--gold);
+        border-radius: 3px;
+        margin-bottom: 18px;
+      }
+      .wcard h3 {
+        font-size: 1rem;
+        margin-bottom: 9px;
+        color: var(--gold-light);
+      }
+      .wcard p {
+        font-size: 13.5px;
+        color: rgba(240, 223, 160, 0.55);
+      }
+      .wcard.stat-card {
+        background: rgba(44, 36, 22, 0.75);
+        border-color: rgba(212, 168, 67, 0.4);
+      }
+      .wcard.stat-card .wbar {
+        background: var(--gold);
+      }
+      .wcard.stat-card h3 {
+        color: var(--gold-light);
+      }
+      .wcard.stat-card p {
+        color: rgba(240, 223, 160, 0.55);
+      }
+      .stat-num {
+        font-family: var(--font-display);
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: var(--gold);
+        line-height: 1;
+        margin-bottom: 6px;
+      }
+
+      /* CONTACT */
+      .contact {
+        padding: var(--pad);
+      }
+      .contact-inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0 28px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: start;
+      }
+      .contact-content .eyebrow {
+        margin-bottom: 14px;
+      }
+      .contact-content h2 {
+        margin-bottom: 14px;
+      }
+      .contact-content > p {
+        margin-bottom: 0;
+      }
+      .contact-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-top: 32px;
+      }
+      .ccard {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 20px 22px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid var(--gold-border);
+        border-radius: var(--r-md);
+        transition: border-color var(--ease);
+      }
+      .ccard:hover {
+        border-color: var(--gold);
+      }
+      .ccard-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 11px;
+        background: var(--gold-wash);
+        border: 1px solid var(--gold-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .ccard-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: var(--warm-mid);
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .ccard-label {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--warm-light);
+        margin-bottom: 2px;
+      }
+      .ccard-value {
+        font-size: 14.5px;
+        font-weight: 500;
+        color: var(--warm-dark);
+      }
+      .contact-panel {
+        background: var(--gold-wash);
+        border-radius: var(--r-lg);
+        border: 1px solid var(--gold-border);
+        padding: 38px 34px;
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+      }
+      .cpanel-title {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--warm-dark);
+        margin-bottom: 4px;
+      }
+      .cpanel-sub {
+        font-size: 13.5px;
+        color: var(--warm-mid);
+      }
+      .map-block {
+        background: var(--white);
+        border-radius: var(--r-md);
+        border: 1px solid var(--gold-border);
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .map-block img {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        display: block;
+        object-fit: contain;
+      }
+      .schedule {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sched-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 11px 0;
+        border-bottom: 1px solid var(--gold-border);
+      }
+      .sched-row:last-child {
+        border-bottom: none;
+      }
+      .sched-day {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--warm-dark);
+      }
+      .sched-time {
+        font-size: 13px;
+        color: var(--warm-mid);
+      }
+
+      /* FOOTER */
+      .footer {
+        background: var(--warm-dark);
+        padding: 60px 0 30px;
+      }
+      .footer-inner {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0 28px;
+      }
+      .footer-top {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 48px;
+        padding-bottom: 44px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        margin-bottom: 28px;
+      }
+      .footer-logo-wrap {
+        display: inline-flex;
+        align-items: center;
+        background: var(--logo-bg);
+        border-radius: 8px;
+        padding: 6px 12px;
+        margin-bottom: 14px;
+      }
+      .footer-logo-wrap img {
+        height: 42px;
+        width: auto;
+        object-fit: contain;
+      }
+      .footer-brand p {
+        font-size: 13px;
+        color: rgba(240, 223, 160, 0.42);
+        line-height: 1.65;
+        max-width: 250px;
+      }
+      .fcol-title {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--gold);
+        opacity: 0.75;
+        margin-bottom: 18px;
+      }
+      .flinks {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+      }
+      .flinks a {
+        font-size: 13.5px;
+        color: rgba(240, 223, 160, 0.42);
+        transition: color var(--ease);
+      }
+      .flinks a:hover {
+        color: var(--gold-light);
+      }
+      .flinks li {
+        font-size: 13.5px;
+        color: rgba(240, 223, 160, 0.42);
+      }
+      .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.2);
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(22px);
+        transition:
+          opacity 0.65s ease,
+          transform 0.65s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 1024px) {
+        .hero-inner {
+          grid-template-columns: 1fr;
+          gap: 44px;
+          padding-top: 60px;
+        }
+        .hero-panel {
+          max-width: 480px;
+        }
+        .about-inner {
+          grid-template-columns: 1fr;
+          gap: 44px;
+        }
+        .about-graphic {
+          aspect-ratio: auto;
+          min-height: 280px;
+        }
+        .prod-header {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+        .prod-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .pcard.feat {
+          grid-column: span 2;
+        }
+        .mosto-tipos {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .steps {
+          grid-template-columns: 1fr 1fr;
+          gap: 40px;
+        }
+        .steps::before {
+          display: none;
+        }
+        .proc-header {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+        .why-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .contact-inner {
+          grid-template-columns: 1fr;
+          gap: 44px;
+        }
+        .footer-top {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 2.2rem;
+        }
+        h2 {
+          font-size: 1.7rem;
+        }
+        .nav-links {
+          display: none;
+        }
+        .hamburger {
+          display: flex;
+        }
+        .prod-grid {
+          grid-template-columns: 1fr;
+        }
+        .pcard.feat {
+          grid-column: span 1;
+          flex-direction: column;
+        }
+        .pcard.feat .pcard-img {
+          width: 100%;
+          min-height: 220px;
+        }
+        .mosto-tipos {
+          grid-template-columns: 1fr 1fr;
+        }
+        .why-grid {
+          grid-template-columns: 1fr;
+        }
+        .footer-top {
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+        .footer-bottom {
+          flex-direction: column;
+          gap: 8px;
+          text-align: center;
+        }
+      }
+      @media (max-width: 480px) {
+        .hero-actions {
+          flex-direction: column;
+        }
+        .hero-actions .btn {
+          width: 100%;
+          justify-content: center;
+        }
+        .mosto-tipos {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="nav-inner">
+        <a href="#inicio" aria-label="METS inicio">
+          <div class="nav-logo-wrap">
+            <img
+              src="./assets/img/unnamed (1)-Photoroom.png"
+              alt="METS Logo transparente"
+            />
+          </div>
+        </a>
+        <nav aria-label="Navegación principal">
+          <ul class="nav-links">
+            <li><a href="#nosotros">Nosotros</a></li>
+            <li><a href="#productos">Productos</a></li>
+            <li><a href="#proceso">Proceso</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+          </ul>
+        </nav>
+        <div style="display: flex; align-items: center; gap: 10px">
+          <a
+            href="#contacto"
+            class="btn btn-dark"
+            style="padding: 10px 18px; font-size: 13px"
+            >Contactarnos</a
+          >
+          <button class="hamburger" id="ham" aria-label="Abrir menú">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+      <nav class="mobile-nav" id="mobNav">
+        <ul>
+          <li><a href="#nosotros" class="mlink">Nosotros</a></li>
+          <li><a href="#productos" class="mlink">Productos</a></li>
+          <li><a href="#proceso" class="mlink">Proceso</a></li>
+          <li><a href="#contacto" class="mlink">Contacto</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero" id="inicio">
+      <div class="hero-inner">
+        <div>
+          <div class="hero-logo">
+            <div class="hero-logo-inner">
+              <img
+                src="./assets/img/unnamed (1)-Photoroom.png"
+                alt="METS — Insumos Vitivinícolas"
+              />
+            </div>
+          </div>
+          <p class="eyebrow" style="margin-bottom: 14px">
+            Insumos Vitivinícolas · Mendoza, Argentina
+          </p>
+          <h1>Pureza en cada<br />etapa del <em>mosto</em></h1>
+          <p class="hero-lead">
+            Somos especialistas en la producción y comercialización de mosto de
+            uva blanca, cremor tártaro y bitartrato de potasio — insumos
+            esenciales para la industria alimentaria y vitivinícola. Atención
+            directa y producto de origen natural.
+          </p>
+          <div class="hero-actions">
+            <a href="#productos" class="btn btn-dark">Ver productos</a>
+            <a href="#contacto" class="btn btn-outline">Hablar con nosotros</a>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <p class="hero-panel-label">Catálogo de productos</p>
+          <ul class="panel-list">
+            <li class="panel-item">
+              <span class="panel-dot"></span>
+              <div>
+                <div class="panel-name">Mosto de Uva Blanca</div>
+                <div class="panel-sub">
+                  Concentrado · Orgánico · Kosher · Sulfitado
+                </div>
+              </div>
+            </li>
+            <li class="panel-item">
+              <span class="panel-dot"></span>
+              <div>
+                <div class="panel-name">Cremor Tártaro</div>
+                <div class="panel-sub">Grado alimentario certificado</div>
+              </div>
+            </li>
+            <li class="panel-item">
+              <span class="panel-dot"></span>
+              <div>
+                <div class="panel-name">Bitartrato de Potasio</div>
+                <div class="panel-sub">Grado enológico y técnico</div>
+              </div>
+            </li>
+            <li class="panel-item">
+              <span class="panel-dot"></span>
+              <div>
+                <div class="panel-name">Tártaro</div>
+                <div class="panel-sub">Subproducto natural de fermentación</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- MARQUEE -->
+    <div class="strip" aria-hidden="true">
+      <div class="strip-track">
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Mosto de Uva Blanca</span
+        >
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Cremor Tártaro</span
+        >
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Bitartrato de Potasio</span
+        >
+        <span class="strip-item"><span class="strip-sep"></span>Tártaro</span>
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Mosto Orgánico · Kosher</span
+        >
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Exportación a España · EE.UU. ·
+          Japón</span
+        >
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Mendoza · Argentina</span
+        >
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Mosto de Uva Blanca</span
+        >
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Cremor Tártaro</span
+        >
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Bitartrato de Potasio</span
+        >
+        <span class="strip-item"><span class="strip-sep"></span>Tártaro</span>
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Mosto Orgánico · Kosher</span
+        >
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Exportación a España · EE.UU. ·
+          Japón</span
+        >
+        <span class="strip-item"
+          ><span class="strip-sep"></span>Mendoza · Argentina</span
+        >
+      </div>
+    </div>
+
+    <!-- NOSOTROS -->
+    <section class="about" id="nosotros">
+      <div class="about-inner">
+        <div class="reveal">
+          <div class="about-graphic">
+            <div class="about-chip">
+              <div class="about-chip-title">Mendoza</div>
+              <div class="about-chip-sub">
+                Capital vitivinícola de Argentina
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="about-content reveal">
+          <p class="eyebrow">Sobre METS</p>
+          <h2>
+            Especialistas en mosto de uva y derivados del proceso vitivinícola
+          </h2>
+          <p>
+            METS nació con el propósito de abastecer a productores y la
+            industria alimentaria con mosto de uva de alta calidad. Con base en
+            Mendoza — la región productora de mosto más importante de Argentina
+            — conocemos de cerca las necesidades del sector y ofrecemos
+            soluciones concretas.
+          </p>
+          <p>
+            Nos especializamos en la producción y comercialización de mosto de
+            uva blanca en sus distintas presentaciones: concentrado, sulfitado,
+            orgánico, kosher, single strength y más. Complementamos nuestra
+            oferta con cremor tártaro y bitartrato de potasio, derivados
+            naturales del proceso de elaboración del mosto.
+          </p>
+          <div class="pillars">
+            <div class="pillar">
+              <div class="pillar-bar"></div>
+              <div>
+                <div class="pillar-title">Materia prima regional</div>
+                <div class="pillar-text">
+                  Trabajamos con uva mendocina de calidad, con trazabilidad
+                  desde el origen hasta el producto final.
+                </div>
+              </div>
+            </div>
+            <div class="pillar">
+              <div class="pillar-bar"></div>
+              <div>
+                <div class="pillar-title">Producto de origen natural</div>
+                <div class="pillar-text">
+                  Mosto libre de aditivos artificiales, con la pureza que exige
+                  la industria alimentaria y los mercados de exportación.
+                </div>
+              </div>
+            </div>
+            <div class="pillar">
+              <div class="pillar-bar"></div>
+              <div>
+                <div class="pillar-title">Trato directo y ágil</div>
+                <div class="pillar-text">
+                  Atención personalizada, respuesta rápida y adaptación a las
+                  necesidades específicas de cada cliente.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCTOS -->
+    <section class="products" id="productos">
+      <div class="prod-inner">
+        <div class="prod-header">
+          <div class="reveal">
+            <p class="eyebrow">Nuestros productos</p>
+            <h2>Lo que ofrecemos</h2>
+          </div>
+          <div class="reveal">
+            <p>
+              Desde mosto de uva blanca en múltiples presentaciones hasta
+              derivados tartáricos naturales, cubrimos las necesidades de la
+              industria alimentaria, bodegas y exportadores.
+            </p>
+          </div>
+        </div>
+
+        <div class="prod-grid">
+          <!-- FEATURED: Mosto de Uva Blanca -->
+          <div class="pcard feat reveal">
+            <div class="pcard-img">
+              <img src="./assets/product/mosto.png" alt="Mosto de Uva Blanca" />
+              <span class="pcard-badge">Producto principal</span>
+            </div>
+            <div class="pcard-body">
+              <h3>Mosto de Uva Blanca</h3>
+              <p>
+                El mosto de uva blanca es nuestro producto principal. Obtenido
+                de uvas blancas de las mejores zonas vitivinícolas de Mendoza,
+                lo procesamos y comercializamos en diversas presentaciones para
+                satisfacer los requerimientos de la industria alimentaria local
+                e internacional. Es utilizado en la elaboración de jugos,
+                bebidas, golosinas, mermeladas, panificados y productos
+                farmacéuticos. Argentina es el principal exportador mundial de
+                jugo concentrado de uva, y desde METS participamos activamente
+                de esa cadena de valor, exportando a países como España, Estados
+                Unidos, Canadá, Perú y Japón.
+              </p>
+              <div class="mosto-tipos">
+                <div class="mosto-tipo">
+                  <div class="mosto-tipo-name">Stándart</div>
+                  <div class="mosto-tipo-desc">
+                    Jugo concentrado de uva blanca para uso industrial general.
+                  </div>
+                </div>
+                <div class="mosto-tipo">
+                  <div class="mosto-tipo-name">Alcoholizado</div>
+                  <div class="mosto-tipo-desc">
+                    Conservado con alcohol vínico, ideal para exportación y
+                    larga vida.
+                  </div>
+                </div>
+                <div class="mosto-tipo">
+                  <div class="mosto-tipo-name">Orgánico</div>
+                  <div class="mosto-tipo-desc">
+                    Producción libre de agroquímicos con certificación orgánica.
+                  </div>
+                </div>
+                <div class="mosto-tipo">
+                  <div class="mosto-tipo-name">Kosher</div>
+                  <div class="mosto-tipo-desc">
+                    Elaborado bajo estrictas normas Kosher para mercados
+                    específicos.
+                  </div>
+                </div>
+                <div class="mosto-tipo">
+                  <div class="mosto-tipo-name">Single Strength</div>
+                  <div class="mosto-tipo-desc">
+                    Jugo sin concentrar, virgen y de primera presión.
+                  </div>
+                </div>
+                <div class="mosto-tipo">
+                  <div class="mosto-tipo-name">Virgen</div>
+                  <div class="mosto-tipo-desc">
+                    Mosto fresco de primera extracción, sin fermentación
+                    iniciada.
+                  </div>
+                </div>
+                <div class="mosto-tipo">
+                  <div class="mosto-tipo-name">Sulfitado</div>
+                  <div class="mosto-tipo-desc">
+                    Preservado con anhídrido sulfuroso para transporte y
+                    almacenaje.
+                  </div>
+                </div>
+              </div>
+              <a href="#contacto" class="card-cta"
+                >Consultar disponibilidad y precios &rarr;</a
+              >
+            </div>
+          </div>
+
+          <!-- Cremor Tártaro -->
+          <div class="pcard reveal">
+            <div class="pcard-img">
+              <img src="./assets/product/image.png" alt="Cremor Tártaro" />
+              <span class="pcard-badge">Producto principal</span>
+            </div>
+            <div class="pcard-body">
+              <h3>Cremor Tártaro</h3>
+              <p>
+                Sal purificada del ácido tartárico con amplia aplicación en
+                pastelería, panadería y elaboración de alimentos. Distribuimos
+                producto certificado de grado alimentario en presentaciones para
+                uso industrial y comercial.
+              </p>
+              <div class="card-tags">
+                <span class="ctag">Grado alimentario</span>
+                <span class="ctag">E336</span>
+                <span class="ctag">Fraccionado</span>
+              </div>
+              <a href="#contacto" class="card-cta"
+                >Consultar disponibilidad &rarr;</a
+              >
+            </div>
+          </div>
+
+          <!-- Bitartrato de Potasio -->
+          <div class="pcard reveal">
+            <div class="pcard-img">
+              <img
+                src="./assets/product/bitartrato.png"
+                alt="Bitartrato de Potasio"
+              />
+            </div>
+            <div class="pcard-body">
+              <h3>Bitartrato de Potasio</h3>
+              <p>
+                Subproducto natural de la fermentación de la uva. Lo recuperamos
+                y procesamos para obtener un producto de alta pureza con
+                aplicaciones en estabilización de mostos y regulación de acidez
+                en la industria alimentaria.
+              </p>
+              <div class="card-tags">
+                <span class="ctag">Alta pureza</span>
+                <span class="ctag">Grado enológico</span>
+                <span class="ctag">A granel</span>
+              </div>
+              <a href="#contacto" class="card-cta">Consultar &rarr;</a>
+            </div>
+          </div>
+
+          <!-- Tártaro -->
+          <div class="pcard reveal">
+            <div class="pcard-img">
+              <img
+                src="./assets/product/tartaro.png"
+                alt="Tártaro"
+                class="tartaro-img"
+              />
+            </div>
+            <div class="pcard-body">
+              <h3>Tártaro</h3>
+              <p>
+                Heces tartáricas recuperadas del proceso de elaboración del
+                mosto y el vino. Materia prima para la obtención de ácido
+                tartárico y otros derivados con aplicaciones industriales.
+              </p>
+              <div class="card-tags">
+                <span class="ctag">Grado técnico</span>
+                <span class="ctag">A granel</span>
+              </div>
+              <a href="#contacto" class="card-cta">Consultar &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESO -->
+    <section class="process" id="proceso">
+      <div class="proc-inner">
+        <div class="proc-header reveal">
+          <div>
+            <p class="eyebrow">Cómo trabajamos</p>
+            <h2>Un proceso orientado a la calidad</h2>
+          </div>
+          <div>
+            <p>
+              Desde la materia prima hasta la entrega, cada etapa está pensada
+              para asegurar consistencia y pureza en el producto final.
+            </p>
+          </div>
+        </div>
+        <div class="steps">
+          <div class="step reveal">
+            <div class="step-num">01</div>
+            <div class="step-title">Selección de materia prima</div>
+            <div class="step-text">
+              Trabajamos con uva blanca de productores seleccionados de Mendoza
+              para garantizar calidad desde el origen.
+            </div>
+          </div>
+          <div class="step reveal">
+            <div class="step-num">02</div>
+            <div class="step-title">Procesamiento y concentración</div>
+            <div class="step-text">
+              Aplicamos procesos controlados de extracción, filtración y
+              concentración para alcanzar los estándares requeridos por cada
+              tipo de mosto.
+            </div>
+          </div>
+          <div class="step reveal">
+            <div class="step-num">03</div>
+            <div class="step-title">Control analítico</div>
+            <div class="step-text">
+              Cada lote es analizado fisicoquímicamente para verificar su
+              composición y adecuación a los estándares alimentarios y de
+              exportación vigentes.
+            </div>
+          </div>
+          <div class="step reveal">
+            <div class="step-num">04</div>
+            <div class="step-title">Distribución y entrega</div>
+            <div class="step-text">
+              Coordinamos fraccionado, embalaje y despacho en todo el país y
+              hacia destinos de exportación, con logística adaptada a cada
+              operación.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- POR QUÉ ELEGIRNOS — vineyard sunset background -->
+    <section class="why" id="por-que">
+      <div class="why-inner">
+        <div class="why-header reveal">
+          <p class="eyebrow">Por qué elegirnos</p>
+          <h2>Un proveedor con propósito</h2>
+          <p>
+            Conocimiento del sector, producto de origen natural y presencia en
+            los mercados más exigentes del mundo.
+          </p>
+        </div>
+        <div class="why-grid">
+          <div class="wcard stat-card reveal">
+            <div class="wbar"></div>
+            <div class="stat-num">METS</div>
+            <h3>Empresa mendocina de mosto</h3>
+            <p>
+              Somos una empresa nacida en Mendoza, la capital vitivinícola de
+              Argentina. Trabajamos directamente con productores locales y
+              conocemos el sector desde adentro.
+            </p>
+          </div>
+
+          <div class="wcard reveal">
+            <div class="wbar"></div>
+            <h3>Exportación a mercados premium</h3>
+            <p>
+              Comercializamos mosto hacia destinos como España, Estados Unidos,
+              Canadá, Perú y Japón — los mercados más exigentes del mundo en
+              calidad y certificación alimentaria.
+            </p>
+          </div>
+
+          <div class="wcard reveal">
+            <div class="wbar"></div>
+            <h3>Variedad de presentaciones</h3>
+            <p>
+              Ofrecemos mosto en todas sus variantes: concentrado, sulfitado,
+              orgánico, kosher, single strength, virgen y alcoholizado,
+              adaptándonos a cada necesidad.
+            </p>
+          </div>
+
+          <div class="wcard reveal">
+            <div class="wbar"></div>
+            <h3>Producto de origen natural</h3>
+            <p>
+              Mosto obtenido de uva mendocina sin aditivos artificiales.
+              Certificaciones disponibles según el tipo: orgánico, kosher,
+              Global Food Safety Initiative.
+            </p>
+          </div>
+
+          <div class="wcard reveal">
+            <div class="wbar"></div>
+            <h3>Documentación analítica</h3>
+            <p>
+              Cada despacho incluye el respaldo técnico que acredita la
+              composición y pureza del producto. Transparencia total en cada
+              operación.
+            </p>
+          </div>
+
+          <div class="wcard reveal">
+            <div class="wbar"></div>
+            <h3>Atención directa sin intermediarios</h3>
+            <p>
+              Un equipo disponible para responder consultas, coordinar entregas
+              y acompañar cada proceso con trato personalizado, tanto para el
+              mercado local como para exportación.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACTO -->
+    <section class="contact" id="contacto">
+      <div class="contact-inner">
+        <div class="contact-content reveal">
+          <p class="eyebrow">Contacto</p>
+          <h2>Hablemos</h2>
+          <p>
+            Estamos disponibles para consultas sobre productos, presentaciones,
+            precios y logística. Comuníquese por el canal que le resulte más
+            cómodo.
+          </p>
+          <div class="contact-cards">
+            <div class="ccard">
+              <div class="ccard-icon">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+                  />
+                  <circle cx="12" cy="9" r="2.5" />
+                </svg>
+              </div>
+              <div>
+                <div class="ccard-label">Ubicación</div>
+                <div class="ccard-value">Mendoza, Argentina</div>
+              </div>
+            </div>
+            <div class="ccard">
+              <div class="ccard-icon">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div class="ccard-label">Teléfono / WhatsApp</div>
+                <div class="ccard-value">+54 2615388034</div>
+              </div>
+            </div>
+            <div class="ccard">
+              <div class="ccard-icon">
+                <svg viewBox="0 0 24 24">
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="M2 8l10 6 10-6" />
+                </svg>
+              </div>
+              <div>
+                <div class="ccard-label">Email comercial</div>
+                <div class="ccard-value">
+                  <a href="mailto:anibalgallardo2@gmail.com"
+                    >anibalgallardo2@gmail.com</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="contact-panel reveal">
+          <div>
+            <div class="cpanel-title">Zona de operaciones</div>
+            <div class="cpanel-sub">
+              Producción y distribución desde Mendoza hacia todo el país y
+              destinos de exportación
+            </div>
+          </div>
+          <div class="map-block">
+            <img
+              src="./assets/product/argentina-map.png"
+              alt="Mapa Argentina — METS opera desde Mendoza"
+            />
+          </div>
+          <div class="schedule">
+            <div class="sched-row">
+              <span class="sched-day">Lunes a Viernes</span
+              ><span class="sched-time">8:00 — 17:00 hs</span>
+            </div>
+            <div class="sched-row">
+              <span class="sched-day">Sábados</span
+              ><span class="sched-time">8:00 — 12:00 hs</span>
+            </div>
+            <div class="sched-row">
+              <span class="sched-day">Domingos y feriados</span
+              ><span class="sched-time">Sin atención</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <div class="footer-logo-wrap">
+              <img
+                src="data:image/png;base64,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"
+                alt="METS Logo"
+              />
+            </div>
+            <p>
+              Especialistas en mosto de uva blanca, cremor tártaro y bitartrato
+              de potasio. Exportamos a España, EE.UU., Canadá, Perú y Japón.
+              Mendoza, Argentina.
+            </p>
+          </div>
+          <div>
+            <div class="fcol-title">Productos</div>
+            <ul class="flinks">
+              <li><a href="#productos">Mosto de Uva Blanca</a></li>
+              <li><a href="#productos">Cremor Tártaro</a></li>
+              <li><a href="#productos">Bitartrato de Potasio</a></li>
+              <li><a href="#productos">Tártaro</a></li>
+            </ul>
+          </div>
+          <div>
+            <div class="fcol-title">Empresa</div>
+            <ul class="flinks">
+              <li><a href="#nosotros">Sobre METS</a></li>
+              <li><a href="#proceso">Nuestro proceso</a></li>
+              <li><a href="#por-que">Por qué elegirnos</a></li>
+              <li><a href="#contacto">Contacto</a></li>
+            </ul>
+          </div>
+          <div>
+            <div class="fcol-title">Contacto</div>
+            <ul class="flinks">
+              <li>
+                <a href="mailto:anibalgallardo2@gmail.com"
+                  >anibalgallardo2@gmail.com</a
+                >
+              </li>
+              <li><a href="tel:+542615388034">+54 2615388034</a></li>
+              <li>Mendoza, Argentina</li>
+              <li>Lun–Vie 8:00 a 17:00 hs</li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span>&copy; 2025 METS. Todos los derechos reservados.</span>
+          <span>Industria vitivinícola argentina</span>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("ham").addEventListener("click", function () {
+        document.getElementById("mobNav").classList.toggle("open");
+      });
+      document.querySelectorAll(".mlink").forEach(function (el) {
+        el.addEventListener("click", function () {
+          document.getElementById("mobNav").classList.remove("open");
+        });
+      });
+      var obs = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              var siblings = Array.from(
+                entry.target.parentElement.querySelectorAll(".reveal"),
+              );
+              var idx = siblings.indexOf(entry.target);
+              entry.target.style.transitionDelay = idx * 0.07 + "s";
+              entry.target.classList.add("visible");
+              obs.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.1 },
+      );
+      document.querySelectorAll(".reveal").forEach(function (el) {
+        obs.observe(el);
+      });
+    </script>
+  </body>
 </html>
